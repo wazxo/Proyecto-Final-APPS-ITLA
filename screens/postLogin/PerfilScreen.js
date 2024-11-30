@@ -6,6 +6,8 @@ import {
   Alert,
   StyleSheet,
   ScrollView,
+  Image,
+  TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
@@ -72,7 +74,13 @@ const PerfilScreen = ({ navigation }) => {
     <ScrollView style={styles.container}>
       {userData ? (
         <>
-          <Text style={styles.title}>Bienvenido, {userData.nombre}</Text>
+          <View style={styles.profileContainer}>
+            <Image
+              source={require("../../assets/profile-placeholder.png")}
+              style={styles.profileImage}
+            />
+            <Text style={styles.title}>Bienvenido, {userData.nombre}</Text>
+          </View>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Nombre:</Text>
             <Text style={styles.value}>
@@ -80,11 +88,18 @@ const PerfilScreen = ({ navigation }) => {
             </Text>
             <Text style={styles.label}>Email:</Text>
             <Text style={styles.value}>{userData.email}</Text>
-            <Text style={styles.label}>Token:</Text>
-            <Text style={styles.value}>{authToken}</Text>
           </View>
-
-          <Button title="Cerrar sesión" onPress={logout} color="#FF5C5C" />
+          <TouchableOpacity
+            style={styles.changePasswordButton}
+            onPress={() => navigation.navigate("ChangePassword")}
+          >
+            <Text style={styles.changePasswordButtonText}>
+              Cambiar Contraseña
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+            <Text style={styles.logoutButtonText}>Cerrar sesión</Text>
+          </TouchableOpacity>
         </>
       ) : (
         <Text style={styles.loadingText}>Cargando datos del usuario...</Text>
@@ -99,11 +114,20 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#f7f7f7",
   },
+  profileContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginVertical: 20,
     color: "#333",
   },
   infoContainer: {
@@ -127,6 +151,27 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 12,
     wordWrap: "break-word",
+  },
+  changePasswordButton: {
+    backgroundColor: "#007bff",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  changePasswordButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  logoutButton: {
+    backgroundColor: "#FF5C5C",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  logoutButtonText: {
+    color: "white",
+    fontSize: 16,
   },
   loadingText: {
     fontSize: 18,
