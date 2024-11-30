@@ -22,6 +22,7 @@ const styles = StyleSheet.create({
   },
 });
 
+
 /* 
 const TareasScreen = () => {
   const [tareas, setTareas] = useState([]);
@@ -70,3 +71,4 @@ const TareasScreen = () => {
     getToken();
   }, []);
 */
+

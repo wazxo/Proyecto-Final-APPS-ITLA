@@ -1,10 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import Nav from "./components/Navigation";
+import Navigation from "./components/navigation";
 
 export default function App() {
   return (
     <>
-      <Nav />
+      <Navigation />
       <StatusBar style="auto" />
     </>
   );
