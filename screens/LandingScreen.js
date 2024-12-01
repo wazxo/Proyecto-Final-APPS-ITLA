@@ -15,7 +15,7 @@ import Logo from "../assets/logo_uasd.svg";
 const { width: screenWidth } = Dimensions.get("window");
 
 export default function LandingScreen() {
-  const img = require("../assets/prueba4.jpg");
+  const img = require("../assets/prueba6.jpg");
   const mision =
     "Su Misión es formar críticamente profesionales, investigadores y técnicos en las ciencias, las humanidades y las artes necesarias y eficientes para coadyuvar a las transformaciones que demanda el desarrollo nacional sostenible, así como difundir los ideales de la cultura de paz, progreso, justicia social, equidad de género y respeto a los derechos humanos, a fin de contribuir a la formación de una conciencia colectiva basada en valores.";
   const vision =
