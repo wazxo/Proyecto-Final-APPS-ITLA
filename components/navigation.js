@@ -7,17 +7,35 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import LoginScreen from "../screens/Login/LoginScreen";
 import ResetPasswordScreen from "../screens/Login/ResetPasswordScreen";
 import CreateUserScreen from "../screens/Login/RegisterScreen";
-import HomeScreen from "../screens/LandingScreen";
+import HomeScreen from "../screens/postLogin/LandingScreen";
 import GestionAcademicaScreen from "./GestionNav";
 import Noticias from "../screens/postLogin/NoticiasScreen";
 import RecursosScreen from "../screens/postLogin/RecursosScreen";
 import SolicitudesScreen from "../screens/postLogin/SolicitudesScreen";
-import ProfileScreen from "../screens/PerfilScreen";
+import ProfileScreen from "../screens/postLogin/PerfilScreen";
+import ChangePasswordScreen from "../screens/postLogin/ChangePasswordScreen";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Drawer"
+        component={DrawerContent}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const DrawerContent = () => {
   return (
     <Drawer.Navigator initialRouteName="Inicio" screenOptions={{
       headerStyle: {
@@ -31,6 +49,8 @@ const DrawerNavigator = () => {
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
+          headerTitle: "Inicio",
+          headerTitleStyle: { fontSize: 18 },
         }}
       />
       <Drawer.Screen
@@ -40,6 +60,8 @@ const DrawerNavigator = () => {
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="school" size={size} color={color} />
           ),
+          headerTitle: "Gestión Académica",
+          headerTitleStyle: { fontSize: 18 },
         }}
       />
       <Drawer.Screen
@@ -53,6 +75,8 @@ const DrawerNavigator = () => {
               color={color}
             />
           ),
+          headerTitle: "Recursos",
+          headerTitleStyle: { fontSize: 18 },
         }}
       />
       <Drawer.Screen
@@ -62,6 +86,8 @@ const DrawerNavigator = () => {
           drawerIcon: ({ color, size }) => (
             <Ionicons name="newspaper" size={size} color={color} />
           ),
+          headerTitle: "Noticias",
+          headerTitleStyle: { fontSize: 18 },
         }}
       />
       <Drawer.Screen
@@ -75,6 +101,8 @@ const DrawerNavigator = () => {
               color={color}
             />
           ),
+          headerTitle: "Solicitudes",
+          headerTitleStyle: { fontSize: 18 },
         }}
       />
       <Drawer.Screen
@@ -84,44 +112,33 @@ const DrawerNavigator = () => {
           drawerIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
+          headerTitle: "Perfil",
+          headerTitleStyle: { fontSize: 18 },
         }}
       />
     </Drawer.Navigator>
   );
 };
 
+const screens = [
+  { name: "Login", component: LoginScreen },
+  { name: "ResetPassword", component: ResetPasswordScreen },
+  { name: "CreateUser", component: CreateUserScreen },
+  { name: "DrawerNavigation", component: DrawerNavigator },
+];
+
 const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="ResetPassword"
-          component={ResetPasswordScreen}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="CreateUser"
-          component={CreateUserScreen}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="DrawerNavigation"
-          component={DrawerNavigator}
-          options={{
-            headerShown: false,
-          }}
-        />
+        {screens.map((screen) => (
+          <Stack.Screen
+            key={screen.name}
+            name={screen.name}
+            component={screen.component}
+            options={{ headerShown: false }}
+          />
+        ))}
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   TextInput,
@@ -12,8 +12,6 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import logo from "../../assets/logo.png";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import tokenData from "../../config/token.json";
 
 const RegisterScreen = ({ navigation }) => {
   const [nombre, setNombre] = useState("");
@@ -22,80 +20,46 @@ const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [secureTextEntry, setSecureTextEntry] = useState(true);
-  const [authToken, setAuthToken] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const togglePasswordVisibility = () => {
     setSecureTextEntry(!secureTextEntry);
   };
 
-  const readToken = async () => {
-    try {
-      if (tokenData.authToken) {
-        console.log("Token recuperado:", tokenData.authToken);
-        await AsyncStorage.setItem("authToken", tokenData.authToken);
-        setAuthToken(tokenData.authToken);
-      } else {
-        console.log("No se encontró un token válido.");
-      }
-    } catch (error) {
-      console.error("Error al leer el archivo token.json:", error);
+  const register = async () => {
+    if (!nombre || !apellido || !username || !email || !password) {
+      Alert.alert("Error", "Por favor, complete todos los campos");
+      return;
     }
-  };
 
-  useEffect(() => {
-    readToken();
-  }, []);
-
-  const handleRegister = async () => {
     setLoading(true);
     try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (token) {
-        const response = await fetch("https://uasdapi.ia3x.com/crear_usuario", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            id: 0, // Puedes ajustar esto según sea necesario
-            nombre,
-            apellido,
-            username,
-            password,
-            email,
-            authToken: token,
-          }),
-        });
+      const response = await fetch("https://uasdapi.ia3x.com/crear_usuario", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: nombre,
+          apellido: apellido,
+          username: username,
+          email: email,
+          password: password,
+        }),
+      });
 
-        const data = await response.json();
-        if (response.ok) {
-          console.log("Registro exitoso:", data);
-          Alert.alert(
-            "Éxito",
-            "Registro exitoso",
-            [
-              {
-                text: "OK",
-                onPress: () => navigation.replace("Login"),
-              },
-            ],
-            { cancelable: false }
-          );
-        } else {
-          console.error("Error en el registro:", data);
-          Alert.alert(
-            "Error",
-            data.message || "Ocurrió un problema al intentar registrarse"
-          );
-        }
+      const responseText = await response.text();
+      const data = responseText ? JSON.parse(responseText) : {};
+
+      if (response.ok && data.success) {
+        Alert.alert("Éxito", "Usuario creado exitosamente");
+        navigation.navigate("Login");
       } else {
-        Alert.alert("Error", "No se encontró un token válido");
+        Alert.alert("Error", data.message || "No se pudo crear el usuario");
       }
     } catch (error) {
-      console.error("Error en el registro:", error);
-      Alert.alert("Error", "Ocurrió un problema al intentar registrarse");
+      console.error("Error en register:", error);
+      Alert.alert("Error", "Ocurrió un problema al intentar crear el usuario");
     } finally {
       setLoading(false);
     }
@@ -112,6 +76,7 @@ const RegisterScreen = ({ navigation }) => {
           placeholder="Nombre"
           value={nombre}
           onChangeText={setNombre}
+          editable={!loading}
         />
       </View>
       <View style={styles.inputContainer}>
@@ -121,6 +86,7 @@ const RegisterScreen = ({ navigation }) => {
           placeholder="Apellido"
           value={apellido}
           onChangeText={setApellido}
+          editable={!loading}
         />
       </View>
       <View style={styles.inputContainer}>
@@ -130,6 +96,7 @@ const RegisterScreen = ({ navigation }) => {
           placeholder="Usuario"
           value={username}
           onChangeText={setUsername}
+          editable={!loading}
         />
       </View>
       <View style={styles.inputContainer}>
@@ -139,6 +106,8 @@ const RegisterScreen = ({ navigation }) => {
           placeholder="Email"
           value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
+          editable={!loading}
         />
       </View>
       <View style={styles.inputContainer}>
@@ -147,10 +116,11 @@ const RegisterScreen = ({ navigation }) => {
           style={styles.input}
           placeholder="Contraseña"
           value={password}
-          secureTextEntry={secureTextEntry}
           onChangeText={setPassword}
+          secureTextEntry={secureTextEntry}
+          editable={!loading}
         />
-        <TouchableOpacity onPress={togglePasswordVisibility}>
+        <TouchableOpacity onPress={togglePasswordVisibility} disabled={loading}>
           <Icon
             name={secureTextEntry ? "eye-off-outline" : "eye-outline"}
             size={25}
@@ -158,15 +128,38 @@ const RegisterScreen = ({ navigation }) => {
           />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.registerButtonText}>Registrars</Text>
-        )}
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-        <Text style={styles.link}>¿Ya tienes cuenta? Inicia sesión</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <TouchableOpacity
+          style={[
+            styles.registerButton,
+            {
+              backgroundColor:
+                nombre && apellido && username && email && password
+                  ? "rgba(90, 154, 230, 1)"
+                  : "#ccc",
+            },
+          ]}
+          onPress={register}
+          disabled={
+            !nombre || !apellido || !username || !email || !password || loading
+          }
+        >
+          <Icon
+            name="log-in-outline"
+            size={20}
+            color="white"
+            style={styles.registerIcon}
+          />
+          <Text style={styles.registerButtonText}>Registrar</Text>
+        </TouchableOpacity>
+      )}
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Login")}
+        disabled={loading}
+      >
+        <Text style={styles.link}>¿Ya tienes una cuenta? Iniciar Sesión</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -213,21 +206,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(90, 154, 230, 1)",
-    borderRadius: 30,
-    width: 200,
-    height: 50,
-    marginVertical: 10,
+    padding: 10,
+    borderRadius: 25,
+    marginBottom: 20,
+  },
+  registerIcon: {
+    marginRight: 10,
   },
   registerButtonText: {
     color: "white",
-    fontWeight: "700",
-    fontSize: 18,
-    textAlign: "center",
+    fontSize: 16,
   },
   link: {
     color: "#1E90FF",
-    marginTop: 10,
+    marginBottom: 10,
   },
 });
 
