@@ -28,11 +28,18 @@
     "react-native-screens": "~4.1.0",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-svg": "^15.9.0",
+<<<<<<< HEAD
     "react-native-vector-icons": "^10.2.0",
     "reanimated-bottom-sheet": "^1.0.0-alpha.22"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
+=======
+    "react-native-vector-icons": "^10.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+>>>>>>> 66bd65365dd63a309e9564e136b8322bd7dbdbec
     "react-native-svg-transformer": "^1.5.0"
   },
   "private": true

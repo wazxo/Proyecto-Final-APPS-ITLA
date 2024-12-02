@@ -43,7 +43,11 @@ const DrawerNavigator = () => {
 
 const DrawerContent = () => {
   return (
-    <Drawer.Navigator initialRouteName="Inicio">
+    <Drawer.Navigator initialRouteName="Inicio" screenOptions={{
+      headerStyle: {
+        backgroundColor: "#084f83"
+      },
+    }}>
       <Drawer.Screen
         name="Inicio"
         component={HomeScreen}
