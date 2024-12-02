@@ -22,18 +22,18 @@ export default function LandingScreen() {
     "La Universidad tiene como Visión ser una institución de excelencia y liderazgo académico, gestionada con eficiencia y acreditada nacional e internacionalmente; con un personal docente, investigador, extensionistas y egresados de alta calificación; creadora de conocimientos científicos y nuevas tecnologías, y reconocida por su contribución al desarrollo humano con equidad y hacia una sociedad democrática y solidaria.";
   const valores = `
 La Universidad está orientada hacia el respeto y la defensa de la dignidad humana y se sustenta en los siguientes valores:
-    
-    - Solidaridad
-    - Transparencia
-    - Verdad
-    - Igualdad
-    - Libertad
-    - Equidad
-    - Tolerancia
-    - Responsabilidad
-    - Convivencia
-    - Paz
-  `;
+
+- Solidaridad
+- Transparencia
+- Verdad
+- Igualdad
+- Libertad
+- Equidad
+- Tolerancia
+- Responsabilidad
+- Convivencia
+- Paz
+`;
 
   const images = [
     require("../../assets/image1.png"),
@@ -70,16 +70,12 @@ La Universidad está orientada hacia el respeto y la defensa de la dignidad huma
           />
         </View>
         <View style={styles.containerData}>
-          <Logo
-            width={300}
-            height={200}
-            style={{ alignSelf: "center", marginTop: 200 }}
-          />
-          <Text style={styles.text}>Misino, Vision y Valores</Text>
-          <Text style={styles.title}>Mision</Text>
+          <Logo width={300} height={200} style={styles.logo} />
+          <Text style={styles.text}>Misión, Visión y Valores</Text>
+          <Text style={styles.title}>Misión</Text>
           <Text style={styles.subTitle}>{mision}</Text>
 
-          <Text style={styles.title}>Vision</Text>
+          <Text style={styles.title}>Visión</Text>
           <Text style={styles.subTitle}>{vision}</Text>
 
           <Text style={styles.title}>Valores</Text>
@@ -97,11 +93,12 @@ const styles = StyleSheet.create({
   },
   containerData: {
     flex: 1,
+    paddingHorizontal: 20, // Agregado para darle margen horizontal al contenido
+    marginTop: 200, // Añadir espacio para el logo
   },
   logo: {
-    justifyContent: "center",
-    width: 100,
-    height: 200,
+    alignSelf: "center",
+    marginTop: 20,
   },
   imageBackground: {
     flex: 1,
@@ -109,7 +106,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backgroundColor: "rgba(0, 0, 0, 0.6)", // Hacer la capa de color más oscura
   },
   carouselContainer: {
     height: 200,
@@ -124,9 +121,10 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: 42,
+    fontSize: 36, // Reducir el tamaño de la fuente para mejorar la legibilidad
     fontWeight: "bold",
     textAlign: "center",
+    marginVertical: 20,
   },
   slide: {
     justifyContent: "center",
@@ -135,23 +133,17 @@ const styles = StyleSheet.create({
   wrapper: {
     width: "100%",
   },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 100,
-  },
   title: {
     color: "white",
-    fontSize: 30,
+    fontSize: 28, // Tamaño moderado para los títulos
     fontWeight: "bold",
     textAlign: "left",
-    margin: 10,
+    marginVertical: 10, // Añadir un margen para separar los títulos
   },
   subTitle: {
     color: "white",
-    fontSize: 20,
+    fontSize: 18, // Reducir un poco el tamaño del texto para mayor claridad
     textAlign: "justify",
-    margin: 10,
+    marginBottom: 20, // Añadir espacio después de cada sección
   },
 });

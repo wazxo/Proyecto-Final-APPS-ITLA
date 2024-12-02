@@ -40,7 +40,7 @@ const ResetPasswordScreen = ({ navigation }) => {
           "Éxito",
           "Se ha enviado un enlace para restablecer tu contraseña a tu correo."
         );
-        navigation.navigate("Iniciar sesión");
+        navigation.navigate("Login");
       } else {
         Alert.alert("Error", data.message || "Ocurrió un problema.");
       }

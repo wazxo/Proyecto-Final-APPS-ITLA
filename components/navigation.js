@@ -15,6 +15,9 @@ import SolicitudesScreen from "../screens/postLogin/solicitudes/SolicitudesScree
 import ProfileScreen from "../screens/postLogin/Perfil/PerfilScreen";
 import ChangePasswordScreen from "../screens/postLogin/Perfil/ChangePasswordScreen";
 import BecaScreen from "../screens/postLogin/solicitudes/tiposSolicitudes/BecaScreen";
+import EventosScreen from "../screens/postLogin/EventosScreen";
+import AcercaDe from "../screens/postLogin/AcercaDe";
+import { Text } from "react-native";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -43,11 +46,13 @@ const DrawerNavigator = () => {
 
 const DrawerContent = () => {
   return (
-    <Drawer.Navigator initialRouteName="Inicio" screenOptions={{
-      headerStyle: {
-        backgroundColor: "#084f83"
-      },
-    }}>
+    <Drawer.Navigator
+      initialRouteName="Inicio"
+      screenOptions={{
+        headerStyle: { backgroundColor: "#f8f9fa" }, // Color de fondo del header
+        drawerActiveTintColor: "#007bff", // Color del texto activo en el drawer
+      }}
+    >
       <Drawer.Screen
         name="Inicio"
         component={HomeScreen}
@@ -55,8 +60,11 @@ const DrawerContent = () => {
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
-          headerTitle: "Inicio",
-          headerTitleStyle: { fontSize: 18 },
+          headerTitle: () => (
+            <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
+              Inicio
+            </Text>
+          ),
         }}
       />
       <Drawer.Screen
@@ -66,8 +74,11 @@ const DrawerContent = () => {
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="school" size={size} color={color} />
           ),
-          headerTitle: "Gestión Académica",
-          headerTitleStyle: { fontSize: 18 },
+          headerTitle: () => (
+            <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
+              Gestión Académica
+            </Text>
+          ),
         }}
       />
       <Drawer.Screen
@@ -81,8 +92,11 @@ const DrawerContent = () => {
               color={color}
             />
           ),
-          headerTitle: "Recursos",
-          headerTitleStyle: { fontSize: 18 },
+          headerTitle: () => (
+            <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
+              Recursos
+            </Text>
+          ),
         }}
       />
       <Drawer.Screen
@@ -92,8 +106,25 @@ const DrawerContent = () => {
           drawerIcon: ({ color, size }) => (
             <Ionicons name="newspaper" size={size} color={color} />
           ),
-          headerTitle: "Noticias",
-          headerTitleStyle: { fontSize: 18 },
+          headerTitle: () => (
+            <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
+              Noticias
+            </Text>
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Eventos"
+        component={EventosScreen}
+        options={{
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="map" size={size} color={color} />
+          ),
+          headerTitle: () => (
+            <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
+              Eventos
+            </Text>
+          ),
         }}
       />
       <Drawer.Screen
@@ -107,8 +138,11 @@ const DrawerContent = () => {
               color={color}
             />
           ),
-          headerTitle: "Solicitudes",
-          headerTitleStyle: { fontSize: 18 },
+          headerTitle: () => (
+            <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
+              Solicitudes
+            </Text>
+          ),
         }}
       />
       <Drawer.Screen
@@ -118,8 +152,29 @@ const DrawerContent = () => {
           drawerIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
-          headerTitle: "Perfil",
-          headerTitleStyle: { fontSize: 18 },
+          headerTitle: () => (
+            <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
+              Perfil
+            </Text>
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Acerca de"
+        component={AcercaDe}
+        options={{
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="information"
+              size={size}
+              color={color}
+            />
+          ),
+          headerTitle: () => (
+            <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
+              Acerca de
+            </Text>
+          ),
         }}
       />
     </Drawer.Navigator>
