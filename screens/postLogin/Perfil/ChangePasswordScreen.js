@@ -95,7 +95,7 @@ const ChangePasswordScreen = ({ navigation }) => {
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
-        <Icon name="arrow-back-outline" size={25} color="#000" />
+        <Icon name="arrow-back-outline" size={30} color="#007bff" />
       </TouchableOpacity>
       <Text style={styles.title}>Cambiar Contraseña</Text>
       <View style={styles.inputContainer}>
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f8f9fa",
   },
   backButton: {
     position: "absolute",

@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f8f9fa",
   },
   logo: {
     height: 150,

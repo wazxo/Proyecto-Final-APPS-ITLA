@@ -11,9 +11,10 @@ import HomeScreen from "../screens/postLogin/LandingScreen";
 import GestionAcademicaScreen from "./GestionNav";
 import Noticias from "../screens/postLogin/NoticiasScreen";
 import RecursosScreen from "../screens/postLogin/RecursosScreen";
-import SolicitudesScreen from "../screens/postLogin/SolicitudesScreen";
-import ProfileScreen from "../screens/postLogin/PerfilScreen";
-import ChangePasswordScreen from "../screens/postLogin/ChangePasswordScreen";
+import SolicitudesScreen from "../screens/postLogin/solicitudes/SolicitudesScreen";
+import ProfileScreen from "../screens/postLogin/Perfil/PerfilScreen";
+import ChangePasswordScreen from "../screens/postLogin/Perfil/ChangePasswordScreen";
+import BecaScreen from "../screens/postLogin/solicitudes/tiposSolicitudes/BecaScreen";
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -29,6 +30,11 @@ const DrawerNavigator = () => {
       <Stack.Screen
         name="ChangePassword"
         component={ChangePasswordScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Solicitud"
+        component={BecaScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
