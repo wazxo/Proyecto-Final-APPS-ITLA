@@ -9,8 +9,6 @@ import {
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { useFocusEffect } from "@react-navigation/native";
 
 const TareasScreen = ({ navigation }) => {
@@ -56,13 +54,24 @@ const TareasScreen = ({ navigation }) => {
     }, [])
   );
 
+  const formatDate = (dateString) => {
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString("es-ES", options);
+  };
+
   const renderTarea = ({ item }) => (
     <View style={styles.tareaContainer}>
       <Text style={styles.tituloText}>{item.titulo}</Text>
       <Text style={styles.descripcionText}>{item.descripcion}</Text>
       <Text style={styles.fechaText}>
-        Vence:{" "}
-        {format(new Date(item.fechaVencimiento), "PPPP p", { locale: es })}
+        Vence: {formatDate(item.fechaVencimiento)}
       </Text>
       <Text
         style={item.completada ? styles.completadaText : styles.pendienteText}

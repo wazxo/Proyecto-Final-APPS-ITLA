@@ -9,8 +9,6 @@ import {
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 
 const HorarioScreen = ({ navigation }) => {
   const [schedules, setSchedules] = useState([]);
@@ -88,6 +86,18 @@ const HorarioScreen = ({ navigation }) => {
     };
   }, [navigation]);
 
+  const formatDate = (dateString) => {
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString("es-ES", options);
+  };
+
   const renderSchedule = (dia, index) => {
     const materias = schedules[dia];
 
@@ -99,7 +109,7 @@ const HorarioScreen = ({ navigation }) => {
             <View key={idx} style={styles.materiaContainer}>
               <Text style={styles.materiaText}>{materia.materia}</Text>
               <Text style={styles.horarioText}>
-                {format(new Date(materia.fechaHora), "PPPP p", { locale: es })}
+                {formatDate(materia.fechaHora)}
               </Text>
               <Text style={styles.aulaText}>Aula: {materia.aula}</Text>
             </View>

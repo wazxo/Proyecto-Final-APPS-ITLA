@@ -137,7 +137,7 @@ const DrawerContent = () => {
           ),
           headerTitle: () => (
             <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
-              Eventos
+              Tareas
             </Text>
           ),
         }}

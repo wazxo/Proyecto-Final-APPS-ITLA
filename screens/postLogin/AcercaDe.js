@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity, Modal, StyleSheet, Linking } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  Linking,
+} from "react-native";
 
 const teamMembers = [
   {
@@ -22,7 +30,8 @@ const teamMembers = [
     technologies: ["Java", "HTML - CSS", "Node.Js", "C#"],
     contact: {
       github: "https://github.com/SamuelAlex899",
-      linkedin: " www.linkedin.com/in/samuel-alexander-ruiz-espinosa-tecnólogo-en-desarrollo-de-software-682550242",
+      linkedin:
+        " www.linkedin.com/in/samuel-alexander-ruiz-espinosa-tecnólogo-en-desarrollo-de-software-682550242",
       email: "samuelruizjs@gmail.com",
       phone: "849-388-8054",
     },
@@ -45,7 +54,7 @@ const teamMembers = [
     name: "Johelin Perez Valdez",
     description:
       "Recuerda, un bug no es un obstáculo, sino una oportunidad para aprender algo nuevo y ser mejor. ¡Eres más fuerte que cualquier error en tu código.",
-    technologies: ["Figma", "Sketch", "Photoshop", "Illustrator"],
+    technologies: ["React", "React Native", "JavaScript", "CSS", "HTML"],
     contact: {
       github: "http://github.com/wazxo",
       linkedin: "https://www.linkedin.com/in/Johelinperez",
@@ -67,8 +76,6 @@ const teamMembers = [
     },
     image: require("../../assets/alberto.jpg"),
   },
-
-
 ];
 
 const App = () => {
@@ -113,9 +120,12 @@ const App = () => {
               <Image source={selectedMember.image} style={styles.modalImage} />
               <Text style={styles.modalTitle}>{selectedMember.name}</Text>
               <Text style={styles.modalRole}>{selectedMember.role}</Text>
-              <Text style={styles.modalDescription}>{selectedMember.description}</Text>
+              <Text style={styles.modalDescription}>
+                {selectedMember.description}
+              </Text>
               <Text style={styles.modalTechnologies}>
-                <Text style={styles.bold}>Tecnologías:</Text> {selectedMember.technologies.join(", ")}
+                <Text style={styles.bold}>Tecnologías:</Text>{" "}
+                {selectedMember.technologies.join(", ")}
               </Text>
               <View style={styles.modalButtons}>
                 <TouchableOpacity
@@ -126,13 +136,17 @@ const App = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.modalButton}
-                  onPress={() => Linking.openURL(selectedMember.contact.linkedin)}
+                  onPress={() =>
+                    Linking.openURL(selectedMember.contact.linkedin)
+                  }
                 >
                   <Text style={styles.modalButtonText}>LinkedIn</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.modalButton}
-                  onPress={() => Linking.openURL(`mailto:${selectedMember.contact.email}`)}
+                  onPress={() =>
+                    Linking.openURL(`mailto:${selectedMember.contact.email}`)
+                  }
                 >
                   <Text style={styles.modalButtonText}>Correo</Text>
                 </TouchableOpacity>

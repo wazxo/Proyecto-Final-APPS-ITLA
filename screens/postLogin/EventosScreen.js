@@ -1,165 +1,160 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
-  TouchableOpacity,
   Alert,
   ActivityIndicator,
-  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  Linking,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { API_KEY } from "../../config"; // Asegúrate de definir tu API_KEY en config.js
-import Icon from "react-native-vector-icons/FontAwesome"; // Importamos FontAwesome para los iconos
-import moment from "moment"; // Para formatear la fecha
+import Icon from "react-native-vector-icons/FontAwesome";
+import { useFocusEffect } from "@react-navigation/native";
 
-const EventosScreen = () => {
+const EventosScreen = ({ navigation }) => {
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [address, setAddress] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
-  const [region, setRegion] = useState({
-    latitude: 18.7357, // Valor inicial por defecto
-    longitude: -70.1627, // Valor inicial por defecto
-    latitudeDelta: 4,
-    longitudeDelta: 4,
-  });
   const mapRef = useRef(null);
 
-  useEffect(() => {
-    const fetchEventos = async () => {
-      try {
-        const storedToken = await AsyncStorage.getItem("authToken");
-        if (!storedToken) {
-          Alert.alert("Error", "No se encontró el token de autenticación");
-          return;
-        }
+  // Obtener los eventos del usuario
+  const fetchEventos = async () => {
+    try {
+      const authToken = await AsyncStorage.getItem("authToken");
+      const response = await axios.get("https://uasdapi.ia3x.com/eventos", {
+        headers: {
+          accept: "*/*",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
-        const response = await fetch("https://uasdapi.ia3x.com/eventos", {
-          headers: {
-            Authorization: storedToken,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Error al obtener los eventos");
-        }
-
-        const data = await response.json();
-        setEventos(data);
-      } catch (error) {
-        console.error("Error fetching eventos:", error);
-        Alert.alert("Error", "Ocurrió un problema al cargar los eventos");
-      } finally {
+      const eventos = response.data || [];
+      if (eventos.length === 0) {
+        console.log("No hay eventos disponibles.");
+        setEventos([]);
         setLoading(false);
+        return;
       }
-    };
 
-    fetchEventos();
-  }, []);
-
-  const handleEventoPress = (coordenadas) => {
-    const [latitude, longitude] = coordenadas.split(", ").map(Number);
-    mapRef.current.animateToRegion({
-      latitude,
-      longitude,
-      latitudeDelta: 0.01, // Menor delta para mayor zoom
-      longitudeDelta: 0.01, // Menor delta para mayor zoom
-    });
-
-    // Llamada a la geocodificación para obtener la dirección
-    geocodeLatLng(latitude, longitude);
+      setEventos(eventos);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error al obtener los eventos:", error);
+      Alert.alert("Error", "No se pudo cargar los eventos.");
+      setLoading(false);
+    }
   };
 
-  const geocodeLatLng = async (latitude, longitude) => {
-    const latlng = `${latitude},${longitude}`;
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      fetchEventos();
+    }, [])
+  );
 
-    try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latlng}&key=${API_KEY}`
-      );
+  const openInGoogleMaps = (lat, lng) => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    Linking.openURL(url).catch((err) =>
+      console.error("Error al abrir Google Maps", err)
+    );
+  };
 
-      if (response.data.status === "OK") {
-        const formattedAddress = response.data.results[0].formatted_address;
-        setAddress(formattedAddress);
-        setModalVisible(true);
-      } else {
-        Alert.alert("Error", "No se pudo encontrar la dirección");
-      }
-    } catch (error) {
-      Alert.alert("Error", `Falló la geocodificación: ${error.message}`);
-    }
+  const moveToLocation = (lat, lng) => {
+    mapRef.current.animateToRegion(
+      {
+        latitude: lat,
+        longitude: lng,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      },
+      1000
+    );
+  };
+
+  const renderEvento = ({ item }) => {
+    const { coordenadas, lugar } = item;
+    const [lat, lng] = coordenadas.split(", ").map(Number);
+    const hasValidLocation = lat && lng;
+
+    return (
+      <View style={styles.eventoContainer}>
+        <Text style={styles.tituloText}>{item.titulo}</Text>
+        <Text style={styles.descripcionText}>{item.descripcion}</Text>
+        <Text style={styles.fechaText}>
+          Fecha: {new Date(item.fechaEvento).toLocaleDateString("es-ES")}
+        </Text>
+        <Text style={styles.lugarText}>Lugar: {lugar}</Text>
+        {hasValidLocation && (
+          <TouchableOpacity
+            style={styles.mapButton}
+            onPress={() => moveToLocation(lat, lng)}
+          >
+            <Icon name="map-marker" size={20} color="#fff" />
+            <Text style={styles.mapButtonText}>Ver en el mapa</Text>
+          </TouchableOpacity>
+        )}
+        {hasValidLocation && (
+          <TouchableOpacity
+            style={styles.directionsButton}
+            onPress={() => openInGoogleMaps(lat, lng)}
+          >
+            <Icon name="map" size={20} color="#fff" />
+            <Text style={styles.directionsButtonText}>Ir a Maps</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
   };
 
   return (
     <View style={styles.container}>
-      <MapView ref={mapRef} style={styles.map} region={region}>
-        {eventos.map((evento) => {
-          const [latitude, longitude] = evento.coordenadas
-            .split(", ")
-            .map(Number);
-          return (
-            <Marker
-              key={evento.id}
-              coordinate={{ latitude, longitude }}
-              title={evento.titulo}
-              description={evento.descripcion}
-              pinColor="#3498db" // Color personalizado para los marcadores
-            />
-          );
-        })}
-      </MapView>
-
-      <View style={styles.eventosContainer}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#3498db" />
-        ) : (
+      {loading ? (
+        <ActivityIndicator size="large" color="#007bff" style={styles.loader} />
+      ) : (
+        <>
+          <MapView
+            ref={mapRef}
+            style={styles.map}
+            initialRegion={{
+              latitude: 18.477011029492324,
+              longitude: -69.8365311114267,
+              latitudeDelta: 0.1,
+              longitudeDelta: 0.1,
+            }}
+            provider={PROVIDER_GOOGLE}
+          >
+            {eventos.map((item) => {
+              const { coordenadas } = item;
+              const [lat, lng] = coordenadas.split(", ").map(Number);
+              console.log(`Evento: ${item.titulo}, Lat: ${lat}, Lng: ${lng}`);
+              return (
+                <Marker
+                  key={item.id}
+                  coordinate={{
+                    latitude: lat,
+                    longitude: lng,
+                  }}
+                  title={item.titulo}
+                  description={item.descripcion}
+                />
+              );
+            })}
+          </MapView>
           <FlatList
             data={eventos}
+            renderItem={renderEvento}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.eventoItem}
-                onPress={() => handleEventoPress(item.coordenadas)}
-              >
-                <Text style={styles.eventoTitulo}>{item.titulo}</Text>
-                <Text style={styles.eventoDescripcion}>{item.descripcion}</Text>
-                <Text style={styles.eventoFecha}>
-                  {moment(item.fechaEvento).format("MMMM Do YYYY, h:mm a")}
-                </Text>
-                <Text style={styles.eventoLugar}>{item.lugar}</Text>
-                <Text style={styles.eventoCoordenadas}>
-                  Coordenadas: {item.coordenadas}
-                </Text>
-              </TouchableOpacity>
-            )}
+            ListEmptyComponent={
+              <Text style={styles.noEventosText}>
+                No hay eventos disponibles.
+              </Text>
+            }
           />
-        )}
-      </View>
-
-      <Modal
-        animationType="fade" // Cambiado a "fade" para el desvanecimiento
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Detalles</Text>
-            <Text style={styles.modalText}>Dirección: {address}</Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Icon name="times-circle" size={30} color="#fff" />
-              <Text style={styles.closeButtonText}>Cerrar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        </>
+      )}
     </View>
   );
 };
@@ -167,105 +162,101 @@ const EventosScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa", // Fondo claro
+    backgroundColor: "#f8f9fa",
   },
-  map: {
-    flex: 2,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    marginBottom: 10,
-  },
-  eventosContainer: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-    paddingTop: 20,
-    paddingHorizontal: 20,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    marginTop: -20, // Para que la lista se superponga ligeramente con el mapa
-  },
-  eventoItem: {
-    padding: 20,
-    backgroundColor: "#ffffff",
-    borderRadius: 15,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 10, // Para sombra en Android
-    borderWidth: 0.5,
-    borderColor: "#ddd",
-  },
-  eventoTitulo: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#2c3e50",
-    marginBottom: 10,
-  },
-  eventoDescripcion: {
-    fontSize: 16,
-    color: "#7f8c8d",
-    marginBottom: 5,
-  },
-  eventoFecha: {
-    fontSize: 14,
-    color: "#16a085",
-    marginBottom: 5,
-  },
-  eventoLugar: {
-    fontSize: 14,
-    color: "#3498db",
-    marginBottom: 5,
-  },
-  eventoCoordenadas: {
-    fontSize: 12,
-    color: "#bdc3c7",
-  },
-  modalOverlay: {
+  loader: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.6)", // Fondo oscuro pero translúcido
-    paddingHorizontal: 30,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
-  modalContent: {
-    backgroundColor: "white",
-    padding: 30,
-    borderRadius: 20,
-    alignItems: "center",
-    width: "90%",
-    maxWidth: 400,
-    elevation: 15, // Sombra para iOS
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#3498db",
-    marginBottom: 15,
-  },
-  modalText: {
-    fontSize: 16,
-    color: "#34495e",
+  eventoContainer: {
+    backgroundColor: "#ffffff",
+    padding: 20,
+    borderRadius: 15,
     marginBottom: 20,
-    textAlign: "center",
+    marginHorizontal: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 5,
   },
-  closeButton: {
-    backgroundColor: "#3498db",
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 10,
+  tituloText: {
+    fontSize: 20,
+    color: "#007bff",
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  descripcionText: {
+    fontSize: 16,
+    color: "#555",
+    marginBottom: 10,
+  },
+  fechaText: {
+    fontSize: 14,
+    color: "#777",
+    marginBottom: 10,
+  },
+  lugarText: {
+    fontSize: 14,
+    color: "#777",
+    marginBottom: 10,
+  },
+  verEnMapaText: {
+    fontSize: 14,
+    color: "#007bff",
+    marginBottom: 10,
+    textDecorationLine: "underline",
+  },
+  errorText: {
+    fontSize: 14,
+    color: "#dc3545",
+    marginBottom: 10,
+  },
+  map: {
+    height: 450, // Hacer el mapa más largo
+    borderRadius: 15,
+    margin: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  noEventosText: {
+    fontSize: 16,
+    color: "#888",
+    fontStyle: "italic",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  mapButton: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#007bff",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
   },
-  closeButtonText: {
-    color: "white",
-    fontSize: 18,
-    marginLeft: 10,
+  mapButtonText: {
+    color: "#fff",
+    marginLeft: 5,
+  },
+  directionsButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#28a745",
+    padding: 10,
+    borderRadius: 5,
+  },
+  directionsButtonText: {
+    color: "#fff",
+    marginLeft: 5,
   },
 });
 

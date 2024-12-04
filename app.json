@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "proyectofinal",
-    "slug": "proyectofinal",
+    "name": "UASD",
+    "slug": "uasd",
     "version": "1.0.0",
     "orientation": "portrait",
     "newArchEnabled": true,
     "splash": {
-      "image": "",
+      "image": "./assets/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -25,7 +25,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.johelin.proyectofinal",
+      "package": "com.uasd",
       "permissions": [
         "INTERNET",
         "ACCESS_FINE_LOCATION",
@@ -41,7 +41,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "b3a5320a-1af4-4774-b25a-b1bcf4c3081c"
+        "projectId": "bb2ab515-f4a8-42d2-893b-d05f713f3017"
       }
     }
   }
