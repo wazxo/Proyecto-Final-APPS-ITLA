@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { useFocusEffect } from "@react-navigation/native";
 
 const TareasScreen = ({ navigation }) => {
   const [tareas, setTareas] = useState([]);
@@ -48,16 +49,12 @@ const TareasScreen = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    const focusListener = navigation.addListener("focus", () => {
+  useFocusEffect(
+    useCallback(() => {
       setLoading(true);
       fetchTareas();
-    });
-
-    return () => {
-      navigation.removeListener("focus", focusListener);
-    };
-  }, [navigation]);
+    }, [])
+  );
 
   const renderTarea = ({ item }) => (
     <View style={styles.tareaContainer}>
