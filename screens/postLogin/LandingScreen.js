@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -9,7 +9,7 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import Carousel from "react-native-snap-carousel";
+import Swiper from "react-native-swiper"; // Cambiado de Carousel a Swiper   npm install react-native-swiper
 import Logo from "../../assets/logo_uasd.svg";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -42,32 +42,24 @@ La Universidad está orientada hacia el respeto y la defensa de la dignidad huma
     require("../../assets/imgen4.png"),
   ];
 
-  const carouselRef = useRef(null);
-
-  const renderItem = ({ item, index }) => {
-    return (
-      <View style={styles.slide}>
-        <Image source={item} style={styles.image} />
-      </View>
-    );
-  };
-
   return (
     <ScrollView style={styles.container}>
       <ImageBackground source={img} style={styles.imageBackground}>
         <View style={styles.overlay} />
         <View style={styles.carouselContainer}>
-          <Carousel
+          <Swiper
             style={styles.wrapper}
-            data={images}
-            renderItem={renderItem}
-            ref={carouselRef}
-            sliderWidth={screenWidth}
-            itemWidth={screenWidth}
-            loop={true}
+            showsPagination={false}
             autoplay={true}
-            autoplayInterval={3000}
-          />
+            autoplayTimeout={3}
+            loop={true}
+          >
+            {images.map((image, index) => (
+              <View key={index} style={styles.slide}>
+                <Image source={image} style={styles.image} />
+              </View>
+            ))}
+          </Swiper>
         </View>
         <View style={styles.containerData}>
           <Logo width={300} height={200} style={styles.logo} />
@@ -93,7 +85,7 @@ const styles = StyleSheet.create({
   },
   containerData: {
     flex: 1,
-    paddingHorizontal: 20, // Agregado para darle margen horizontal al contenido
+    paddingHorizontal: 20,
     marginTop: 200, // Añadir espacio para el logo
   },
   logo: {
@@ -106,7 +98,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.6)", // Hacer la capa de color más oscura
+    backgroundColor: "rgba(0, 0, 0, 0.6)", // Oscurecer capa
   },
   carouselContainer: {
     height: 200,
@@ -121,7 +113,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: 36, // Reducir el tamaño de la fuente para mejorar la legibilidad
+    fontSize: 36,
     fontWeight: "bold",
     textAlign: "center",
     marginVertical: 20,
@@ -135,15 +127,15 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "white",
-    fontSize: 28, // Tamaño moderado para los títulos
+    fontSize: 28,
     fontWeight: "bold",
     textAlign: "left",
-    marginVertical: 10, // Añadir un margen para separar los títulos
+    marginVertical: 10,
   },
   subTitle: {
     color: "white",
-    fontSize: 18, // Reducir un poco el tamaño del texto para mayor claridad
+    fontSize: 18,
     textAlign: "justify",
-    marginBottom: 20, // Añadir espacio después de cada sección
+    marginBottom: 20,
   },
 });
