@@ -32,6 +32,15 @@ const EventosScreen = ({ navigation }) => {
       });
 
       const eventos = response.data || [];
+      if (response.status === 200) {
+        console.log("Conexión con la API exitosa. Datos recibidos:", eventos);
+      } else {
+        console.warn(
+          "Conexión realizada pero con respuesta inesperada:",
+          response.status
+        );
+      }
+
       if (eventos.length === 0) {
         console.log("No hay eventos disponibles.");
         setEventos([]);
@@ -42,7 +51,7 @@ const EventosScreen = ({ navigation }) => {
       setEventos(eventos);
       setLoading(false);
     } catch (error) {
-      console.error("Error al obtener los eventos:", error);
+      console.error("Error al conectar con la API:", error);
       Alert.alert("Error", "No se pudo cargar los eventos.");
       setLoading(false);
     }

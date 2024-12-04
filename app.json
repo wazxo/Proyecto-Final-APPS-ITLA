@@ -8,33 +8,37 @@
     "splash": {
       "image": "./assets/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#f8f9fa"
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.uasd.app",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Necesitamos acceso a tu ubicación para mostrarte contenido relevante.",
-        "NSPhotoLibraryUsageDescription": "Necesitamos acceso a tu galería para guardar archivos.",
-        "NSPhotoLibraryAddUsageDescription": "Necesitamos acceso para guardar archivos en tu galería.",
-        "NSCameraUsageDescription": "Necesitamos acceso a tu cámara para tomar fotos.",
-        "NSMicrophoneUsageDescription": "Necesitamos acceso a tu micrófono para grabar audio."
+        "NSLocationWhenInUseUsageDescription": "La aplicación necesita acceder a tu ubicación para proporcionarte información y servicios basados en tu posición.",
+        "NSPhotoLibraryUsageDescription": "La aplicación necesita acceder a tu galería para cargar y guardar imágenes.",
+        "NSPhotoLibraryAddUsageDescription": "La aplicación necesita permiso para guardar imágenes en tu galería.",
+        "NSCameraUsageDescription": "La aplicación necesita acceso a tu cámara para tomar fotos.",
+        "NSMicrophoneUsageDescription": "La aplicación necesita acceso a tu micrófono para grabar audio."
       }
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
       "package": "com.uasd",
       "permissions": [
         "INTERNET",
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "CAMERA",
-        "RECORD_AUDIO"
-      ]
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#f8f9fa"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "tu-clave-de-api-de-google-maps"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -43,6 +47,10 @@
       "eas": {
         "projectId": "bb2ab515-f4a8-42d2-893b-d05f713f3017"
       }
+    },
+    "assetBundlePatterns": ["**/*"],
+    "updates": {
+      "fallbackToCacheTimeout": 0
     }
   }
 }
