@@ -9,66 +9,33 @@ import {
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 const HorarioScreen = ({ navigation }) => {
-  const [schedules, setSchedules] = useState({
-    Lunes: [],
-    Martes: [],
-    Miércoles: [],
-    Jueves: [],
-    Viernes: [],
-    Sábado: [],
-    Domingo: [],
-  });
+  const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [hasPreseleccionadas, setHasPreseleccionadas] = useState(false);
 
-  // Obtener las materias preseleccionadas del usuario
-  const fetchPreseleccionadas = async () => {
+  // Obtener los horarios del usuario
+  const fetchHorarios = async () => {
     try {
       const authToken = await AsyncStorage.getItem("authToken");
-      const response = await axios.get(
-        "https://uasdapi.ia3x.com/ver_preseleccion",
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
-      );
+      const response = await axios.get("https://uasdapi.ia3x.com/horarios", {
+        headers: {
+          accept: "*/*",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
-      const materias = response.data.data || [];
-      if (materias.length === 0) {
-        console.log("No hay materias preseleccionadas.");
-        // Limpiar la data si no hay materias preseleccionadas
-        setSchedules({
-          Lunes: [],
-          Martes: [],
-          Miércoles: [],
-          Jueves: [],
-          Viernes: [],
-          Sábado: [],
-          Domingo: [],
-        });
+      const horarios = response.data || [];
+      if (horarios.length === 0) {
+        console.log("No hay horarios disponibles.");
+        setSchedules([]);
         setLoading(false);
-        setHasPreseleccionadas(false);
         return;
       }
 
-      setHasPreseleccionadas(true);
-
-      // Obtener las materias disponibles
-      const availableMateriasResponse = await axios.get(
-        "https://uasdapi.ia3x.com/materias_disponibles",
-        {
-          headers: {
-            accept: "*/*",
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
-
-      const availableMaterias = availableMateriasResponse.data || [];
-      console.log("Materias disponibles:", availableMaterias);
-
-      // Agrupar las materias preseleccionadas por día
+      // Agrupar los horarios por día
       const groupedSchedule = {
         Lunes: [],
         Martes: [],
@@ -79,69 +46,48 @@ const HorarioScreen = ({ navigation }) => {
         Domingo: [],
       };
 
-      // Asociar el horario de cada materia preseleccionada con las materias disponibles
-      materias.forEach((materia) => {
-        // Buscar la materia en las disponibles por su código
-        const availableMateria = availableMaterias.find(
-          (m) => m.codigo === materia.codigo
-        );
+      horarios.forEach((horario) => {
+        const fecha = new Date(horario.fechaHora);
+        const diaSemana = fecha.toLocaleDateString("es-ES", {
+          weekday: "long",
+        });
+        const diaMap = {
+          lunes: "Lunes",
+          martes: "Martes",
+          miércoles: "Miércoles",
+          jueves: "Jueves",
+          viernes: "Viernes",
+          sábado: "Sábado",
+          domingo: "Domingo",
+        };
 
-        if (availableMateria) {
-          const horario = availableMateria.horario;
-          if (horario && typeof horario === "string") {
-            // Normalizamos el horario (convertimos a minúsculas y eliminamos espacios adicionales)
-            const dia = horario.split(" ")[0].toLowerCase().trim(); // Extraemos el día en minúsculas
-
-            // Mapeo de días de la semana
-            const diaMap = {
-              lunes: "Lunes",
-              martes: "Martes",
-              miércoles: "Miércoles",
-              jueves: "Jueves",
-              viernes: "Viernes",
-              sábado: "Sábado",
-              domingo: "Domingo",
-              domingos: "Domingo", // Añadimos "domingos" para manejar este caso específico
-            };
-
-            // Si el día es válido, lo agregamos
-            if (diaMap[dia]) {
-              groupedSchedule[diaMap[dia]].push(availableMateria);
-            } else {
-              console.warn(`Día no válido para ${materia.nombre}:`, dia);
-            }
-          } else {
-            console.warn(
-              `El horario de la materia ${materia.nombre} no es válido:`,
-              horario
-            );
-          }
+        if (diaMap[diaSemana]) {
+          groupedSchedule[diaMap[diaSemana]].push(horario);
+        } else {
+          console.warn(`Día no válido para ${horario.materia}:`, diaSemana);
         }
       });
 
-      // Actualizamos el estado con el horario agrupado
       setSchedules(groupedSchedule);
-      setLoading(false); // Dejar de mostrar la animación de carga
+      setLoading(false);
     } catch (error) {
-      console.error("Error al obtener las materias:", error);
-      Alert.alert("Error", "No se pudo cargar las materias.");
-      setLoading(false); // Dejar de mostrar la animación de carga
+      console.error("Error al obtener los horarios:", error);
+      Alert.alert("Error", "No se pudo cargar los horarios.");
+      setLoading(false);
     }
   };
 
-  // Llamada a la API cuando la pantalla se monta o vuelve a recibir foco
   useEffect(() => {
     const focusListener = navigation.addListener("focus", () => {
-      setLoading(true); // Mostrar el indicador de carga cuando la pantalla recibe foco
-      fetchPreseleccionadas();
+      setLoading(true);
+      fetchHorarios();
     });
 
     return () => {
-      navigation.removeListener("focus", focusListener); // Limpiar el listener cuando se deje de mostrar la pantalla
+      navigation.removeListener("focus", focusListener);
     };
   }, [navigation]);
 
-  // Renderizar el horario agrupado por día
   const renderSchedule = (dia, index) => {
     const materias = schedules[dia];
 
@@ -151,8 +97,10 @@ const HorarioScreen = ({ navigation }) => {
         {materias.length > 0 ? (
           materias.map((materia, idx) => (
             <View key={idx} style={styles.materiaContainer}>
-              <Text style={styles.materiaText}>{materia.nombre}</Text>
-              <Text style={styles.horarioText}>{materia.horario}</Text>
+              <Text style={styles.materiaText}>{materia.materia}</Text>
+              <Text style={styles.horarioText}>
+                {format(new Date(materia.fechaHora), "PPPP p", { locale: es })}
+              </Text>
               <Text style={styles.aulaText}>Aula: {materia.aula}</Text>
             </View>
           ))
@@ -185,7 +133,6 @@ const HorarioScreen = ({ navigation }) => {
   );
 };
 
-// Estilos mejorados
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -195,9 +142,9 @@ const styles = StyleSheet.create({
   },
   loader: {
     flex: 1,
-    justifyContent: "center", // Centrado vertical
-    alignItems: "center", // Centrado horizontal
-    position: "absolute", // Para que se coloque encima de los demás componentes
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
@@ -214,7 +161,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     marginBottom: 10,
-    textTransform: "capitalize", // Para asegurar que los días estén con la primera letra en mayúscula
+    textTransform: "capitalize",
   },
   materiaContainer: {
     backgroundColor: "#ffffff",

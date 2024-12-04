@@ -17,6 +17,7 @@ import ChangePasswordScreen from "../screens/postLogin/Perfil/ChangePasswordScre
 import BecaScreen from "../screens/postLogin/solicitudes/tiposSolicitudes/BecaScreen";
 import EventosScreen from "../screens/postLogin/EventosScreen";
 import AcercaDe from "../screens/postLogin/AcercaDe";
+import TareasScreen from "../screens/postLogin/TareasScreen";
 import { Text } from "react-native";
 
 const Stack = createStackNavigator();
@@ -119,6 +120,20 @@ const DrawerContent = () => {
         options={{
           drawerIcon: ({ color, size }) => (
             <Ionicons name="map" size={size} color={color} />
+          ),
+          headerTitle: () => (
+            <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>
+              Eventos
+            </Text>
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Tareas"
+        component={TareasScreen}
+        options={{
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="document-text" size={size} color={color} />
           ),
           headerTitle: () => (
             <Text style={{ fontSize: 18, maxWidth: 200 }} numberOfLines={1}>

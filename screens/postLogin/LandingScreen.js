@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -7,9 +7,10 @@ import {
   ImageBackground,
   Image,
   Dimensions,
+  FlatList,
+  TouchableOpacity,
   ScrollView,
 } from "react-native";
-import Swiper from "react-native-swiper"; // Cambiado de Carousel a Swiper   npm install react-native-swiper
 import Logo from "../../assets/logo_uasd.svg";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -22,18 +23,18 @@ export default function LandingScreen() {
     "La Universidad tiene como Visión ser una institución de excelencia y liderazgo académico, gestionada con eficiencia y acreditada nacional e internacionalmente; con un personal docente, investigador, extensionistas y egresados de alta calificación; creadora de conocimientos científicos y nuevas tecnologías, y reconocida por su contribución al desarrollo humano con equidad y hacia una sociedad democrática y solidaria.";
   const valores = `
 La Universidad está orientada hacia el respeto y la defensa de la dignidad humana y se sustenta en los siguientes valores:
-
-- Solidaridad
-- Transparencia
-- Verdad
-- Igualdad
-- Libertad
-- Equidad
-- Tolerancia
-- Responsabilidad
-- Convivencia
-- Paz
-`;
+    
+    - Solidaridad
+    - Transparencia
+    - Verdad
+    - Igualdad
+    - Libertad
+    - Equidad
+    - Tolerancia
+    - Responsabilidad
+    - Convivencia
+    - Paz
+  `;
 
   const images = [
     require("../../assets/image1.png"),
@@ -42,27 +43,58 @@ La Universidad está orientada hacia el respeto y la defensa de la dignidad huma
     require("../../assets/imgen4.png"),
   ];
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleScroll = (event) => {
+    const index = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
+    setCurrentIndex(index);
+  };
+
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.slide}>
+        <Image source={item} style={styles.image} />
+      </View>
+    );
+  };
+
+  const renderIndicators = () => {
+    return (
+      <View style={styles.indicatorContainer}>
+        {images.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.indicator,
+              index === currentIndex ? styles.activeIndicator : null,
+            ]}
+          />
+        ))}
+      </View>
+    );
+  };
+
   return (
     <ScrollView style={styles.container}>
       <ImageBackground source={img} style={styles.imageBackground}>
         <View style={styles.overlay} />
-        <View style={styles.carouselContainer}>
-          <Swiper
-            style={styles.wrapper}
-            showsPagination={false}
-            autoplay={true}
-            autoplayTimeout={3}
-            loop={true}
-          >
-            {images.map((image, index) => (
-              <View key={index} style={styles.slide}>
-                <Image source={image} style={styles.image} />
-              </View>
-            ))}
-          </Swiper>
-        </View>
+        <FlatList
+          data={images}
+          renderItem={renderItem}
+          keyExtractor={(_, index) => index.toString()}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={handleScroll}
+          style={styles.carousel}
+        />
+        {renderIndicators()}
         <View style={styles.containerData}>
-          <Logo width={300} height={200} style={styles.logo} />
+          <Logo
+            width={300}
+            height={200}
+            style={{ alignSelf: "center", marginTop: 20 }}
+          />
           <Text style={styles.text}>Misión, Visión y Valores</Text>
           <Text style={styles.title}>Misión</Text>
           <Text style={styles.subTitle}>{mision}</Text>
@@ -85,11 +117,6 @@ const styles = StyleSheet.create({
   },
   containerData: {
     flex: 1,
-    paddingHorizontal: 20,
-    marginTop: 200, // Añadir espacio para el logo
-  },
-  logo: {
-    alignSelf: "center",
     marginTop: 20,
   },
   imageBackground: {
@@ -98,44 +125,53 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.6)", // Oscurecer capa
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
-  carouselContainer: {
-    height: 200,
-    width: "100%",
-    position: "absolute",
-    top: 0,
+  carousel: {
+    marginTop: 50,
   },
   image: {
-    width: "100%",
-    height: "100%",
+    width: screenWidth,
+    height: 200,
     resizeMode: "cover",
-  },
-  text: {
-    color: "white",
-    fontSize: 36,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 20,
   },
   slide: {
     justifyContent: "center",
     alignItems: "center",
   },
-  wrapper: {
-    width: "100%",
+  text: {
+    color: "white",
+    fontSize: 42,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   title: {
     color: "white",
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "bold",
     textAlign: "left",
-    marginVertical: 10,
+    margin: 10,
   },
   subTitle: {
     color: "white",
-    fontSize: 18,
+    fontSize: 20,
     textAlign: "justify",
-    marginBottom: 20,
+    margin: 10,
+  },
+  indicatorContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  indicator: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "gray",
+    marginHorizontal: 5,
+  },
+  activeIndicator: {
+    backgroundColor: "white",
   },
 });
